@@ -1,51 +1,71 @@
+import json
 import os
-file_name= "tasks01.txt"
+
+DOSYA_ADI = "todo.json"
+
+# Dosya yoksa boş liste oluştur
+def dosya_kontrol_et():
+    if not os.path.exists(DOSYA_ADI):
+        with open(DOSYA_ADI, "w", encoding="utf-8") as f:
+            json.dump([], f, ensure_ascii=False, indent=2)
+
+# Dosyadan görevleri oku
+def gorevleri_yukle():
+    with open(DOSYA_ADI, "r", encoding="utf-8") as f:
+        return json.load(f)
+
+# Görevleri kaydet
+def gorevleri_kaydet(gorevler):
+    with open(DOSYA_ADI, "w", encoding="utf-8") as f:
+        json.dump(gorevler, f, ensure_ascii=False, indent=2)
+
+def gorev_ekle():
+    gorev = input("Yeni görevi girin: ")
+    liste = gorevleri_yukle()
+    liste.append({"gorev": gorev, "tamamlandi": False})
+    gorevleri_kaydet(liste)
+    print("✅ Görev eklendi!")
+
+def gorev_listele():
+    liste = gorevleri_yukle()
+    if not liste:
+        print("📭 Henüz görev yok.")
+    else:
+        for i, g in enumerate(liste, 1):
+            durum = "✔️" if g["tamamlandi"] else "❌"
+            print(f"{i}. {g['gorev']} [{durum}]")
+
+def gorev_tamamla():
+    liste = gorevleri_yukle()
+    gorev_listele()
+    try:
+        secim = int(input("Tamamlandı olarak işaretlemek istediğiniz görev numarası: "))
+        liste[secim - 1]["tamamlandi"] = True
+        gorevleri_kaydet(liste)
+        print("✅ Görev tamamlandı!")
+    except (IndexError, ValueError):
+        print("⚠️ Geçersiz seçim!")
 
 def menu():
-    print("\n -- TODO LISTS --")
-    print("1. Add a Task")
-    print("2. Listing works.")
-    print("3. exit")
+    print("\n--- TODO LİSTESİ ---")
+    print("1. Görev Ekle")
+    print("2. Görevleri Listele")
+    print("3. Görevi Tamamla")
+    print("4. Çık")
 
-
-def add_task():
-    task = input("Please add a task: ").strip()
-    if task:
-        with open(file_name, "a" , encoding="utf-8") as file:
-            file.write(task + "\n")
-        print("task succesfully added")
-    else:
-        print("blank file cannot adding")
-
-
-def task_list():
-    if not os.path.exists(file_name):
-        print("you have not anny task yet")
-        return
-
-
-    with open(file_name, "r", encoding="utf-8") as file:
-        tasks = [g.strip() for g in file.readline() if g.strip()]
-
-
-    if not tasks:
-        print("you have not any tasks yet")
-    else:
-        print("\n tasks: ")
-        for i, task in enumerate(tasks, 1):
-            print(f"i.{task}")
-
-
-
+# Ana döngü
+dosya_kontrol_et()
 while True:
     menu()
-    choice = input("Your choice").strip()
-    if choice == "1":
-        add_task()
-    elif choice == "2":
-        task_list()
-    elif choice == "3":
-        print("you are exiting the program ")
+    secim = input("Seçiminiz: ")
+    if secim == "1":
+        gorev_ekle()
+    elif secim == "2":
+        gorev_listele()
+    elif secim == "3":
+        gorev_tamamla()
+    elif secim == "4":
+        print("Çıkılıyor...")
         break
     else:
-        print("invalid selection ")
+        print("Geçersiz seçim!")
