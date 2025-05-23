@@ -1,6 +1,10 @@
 [
   {
-    "gorev": "task 1",
-    "tamamlandi": false
+    "task": "go push forward",
+    "completed": true
+  },
+  {
+    "task": "alright keep going",
+    "completed": false
   }
 ]
